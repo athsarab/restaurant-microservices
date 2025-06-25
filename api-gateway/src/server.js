@@ -1,56 +1,68 @@
 const express = require('express');
-const morgan = require('morgan');
 const cors = require('cors');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const helmet = require('helmet');
 const dotenv = require('dotenv');
-const jwt = require('jsonwebtoken');
+const morgan = require('morgan');
+const path = require('path');
+const fs = require('fs');
 
 // Load environment variables
 dotenv.config();
 
+// Import middlewares
+const { apiLimiter } = require('./middlewares/rateLimiter');
+const { notFound, errorHandler } = require('./middlewares/errorHandler');
+const logger = require('./utils/logger');
+
+// Import routes
+const userRoutes = require('./routes/userRoutes');
+const menuRoutes = require('./routes/menuRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+
+// Create Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Create logs directory if it doesn't exist
+const logDir = path.join(__dirname, '../logs');
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
+
+// Security middleware
+app.use(helmet());
 app.use(cors());
+
+// Request parsing
 app.use(express.json());
-app.use(morgan('dev'));
+app.use(express.urlencoded({ extended: true }));
 
-// Auth middleware to verify JWT
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  
-  if (!authHeader) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-  
-  const token = authHeader.split(' ')[1];
-  
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Invalid token' });
-  }
-};
+// Logging
+app.use(morgan('combined', { stream: logger.stream }));
 
-// Routes that don't require authentication
-app.use('/api/users/login', createProxyMiddleware({ target: 'http://localhost:3001', changeOrigin: true }));
-app.use('/api/users/register', createProxyMiddleware({ target: 'http://localhost:3001', changeOrigin: true }));
-app.use('/api/menu', createProxyMiddleware({ target: 'http://localhost:3002', changeOrigin: true }));
-
-// Routes that require authentication
-app.use('/api/users/profile', verifyToken, createProxyMiddleware({ target: 'http://localhost:3001', changeOrigin: true }));
-app.use('/api/orders', verifyToken, createProxyMiddleware({ target: 'http://localhost:3003', changeOrigin: true }));
-app.use('/api/payments', verifyToken, createProxyMiddleware({ target: 'http://localhost:3004', changeOrigin: true }));
-app.use('/api/reviews', verifyToken, createProxyMiddleware({ target: 'http://localhost:3005', changeOrigin: true }));
+// Apply rate limiting to all requests
+app.use(apiLimiter);
 
 // Health check route
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// API routes
+app.use('/api/users', userRoutes);
+app.use('/api/menu', menuRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/reviews', reviewRoutes);
+
+// Error handling
+app.use(notFound);
+app.use(errorHandler);
+
+// Start server
 app.listen(PORT, () => {
+  logger.info(`API Gateway running on port ${PORT}`);
   console.log(`API Gateway running on port ${PORT}`);
 });
