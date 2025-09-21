@@ -12,7 +12,7 @@ const DishDetail = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [reviewText, setReviewText] = useState('');
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(5); 
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [relatedDishes, setRelatedDishes] = useState([]);
 
