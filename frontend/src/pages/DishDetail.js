@@ -14,7 +14,7 @@ const DishDetail = () => {
   const [reviewText, setReviewText] = useState('');
   const [rating, setRating] = useState(5); 
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [relatedDishes, setRelatedDishes] = useState([]);
+  const [relatedDishes, setRelatedDishes] = useState([]); 
 
   useEffect(() => {
     const fetchData = async () => {
