@@ -36,7 +36,7 @@ const DishDetail = () => {
         
         // Fetch related dishes from the same category
         if (dishData.category) {
-          try {
+          try { 
             const categoryDishes = await menuService.getDishesByCategory(dishData.category._id);
             // Filter out the current dish and limit to 3
             const related = categoryDishes
