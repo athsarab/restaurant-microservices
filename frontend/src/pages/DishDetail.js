@@ -91,7 +91,7 @@ const DishDetail = () => {
 
     try {
       setReviewSubmitting(true);
-      await reviewService.createReview({
+      await reviewService.createReview({ 
         dish: id,
         rating,
         comment: reviewText
