@@ -62,7 +62,7 @@ const DishDetail = () => {
       setDish(null);
       setReviews([]);
       setQuantity(1);
-    };
+    }; 
   }, [id]);
 
   const handleQuantityChange = (e) => {
