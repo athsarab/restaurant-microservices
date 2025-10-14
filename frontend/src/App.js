@@ -7,7 +7,7 @@ import './App.css';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 
-// Pages
+// Pages 
 import Home from './pages/Home';
 import Menu from './pages/Menu';
 import DishDetail from './pages/DishDetail';
