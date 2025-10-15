@@ -6,7 +6,7 @@ const logFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
 );
-
+ 
 // Create logger
 const logger = winston.createLogger({
   level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
