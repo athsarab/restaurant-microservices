@@ -28,7 +28,7 @@ const logger = winston.createLogger({
     new winston.transports.File({
       filename: path.join(__dirname, '../../logs/combined.log')
     })
-  ]
+  ] 
 });
 
 // Create a stream object with a 'write' function for Morgan
