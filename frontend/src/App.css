@@ -13,7 +13,7 @@
   flex: 1;
 }
 
-main {
+main { 
   padding: 2rem 0;
   min-height: calc(100vh - 64px - 200px); /* Account for header and footer */
 }
