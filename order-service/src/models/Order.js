@@ -14,7 +14,7 @@ const orderSchema = new mongoose.Schema({
         ref: 'Dish'
       },
       name: String,
-      price: Number,
+      price: Number, 
       quantity: {
         type: Number,
         required: true,
