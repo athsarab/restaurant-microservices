@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     street: String,
     city: String,
     state: String,
-    zipCode: String 
+    zipCode: String  
   },
   role: {
     type: String,
