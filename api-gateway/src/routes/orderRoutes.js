@@ -6,6 +6,6 @@ const { createServiceProxy } = require('../utils/proxyHelper');
 const orderServiceUrl = process.env.ORDER_SERVICE_URL || 'http://localhost:3003';
 
 // All order routes require authentication
-router.use('/', verifyToken, createServiceProxy(orderServiceUrl));
+router.use('/', verifyToken, createServiceProxy(orderServiceUrl)); 
 
 module.exports = router;
