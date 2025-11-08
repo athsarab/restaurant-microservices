@@ -20,7 +20,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); 
 app.use(morgan('dev'));
 
 // Routes
