@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
   // Check if route doesn't require auth
   const publicRoutes = [
     { path: '/api/menu', method: 'GET' },
-    { path: '/api/menu/categories', method: 'GET' },
+    { path: '/api/menu/categories', method: 'GET' }, 
     { path: new RegExp('^/api/menu/categories/[^/]+$'), method: 'GET' },
     { path: new RegExp('^/api/menu/dishes/[^/]+$'), method: 'GET' }
   ];
