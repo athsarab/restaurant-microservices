@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
   const isPublicRoute = publicRoutes.some(route => {
     if (route.path instanceof RegExp) {
       return route.path.test(req.path) && req.method === route.method;
-    }
+    } 
     return req.path === route.path && req.method === route.method;
   });
 
