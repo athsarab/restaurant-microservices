@@ -18,7 +18,7 @@ module.exports = (req, res, next) => {
     } 
     return req.path === route.path && req.method === route.method;
   });
-
+ 
   if (isPublicRoute) {
     return next();
   }
