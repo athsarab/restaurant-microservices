@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
     { path: new RegExp('^/api/menu/categories/[^/]+$'), method: 'GET' },
     { path: new RegExp('^/api/menu/dishes/[^/]+$'), method: 'GET' }
   ];
-
+ 
   const isPublicRoute = publicRoutes.some(route => {
     if (route.path instanceof RegExp) {
       return route.path.test(req.path) && req.method === route.method;
