@@ -5,6 +5,7 @@ services:
   mongo-user:
     image: mongo:latest
     container_name: mongo-user
+    restart: unless-stopped
     volumes:
       - mongo-user-data:/data/db
     ports:
@@ -15,6 +16,7 @@ services:
   mongo-menu:
     image: mongo:latest
     container_name: mongo-menu
+    restart: unless-stopped
     volumes:
       - mongo-menu-data:/data/db
     ports:
@@ -25,6 +27,7 @@ services:
   mongo-order:
     image: mongo:latest
     container_name: mongo-order
+    restart: unless-stopped
     volumes:
       - mongo-order-data:/data/db
     ports:
@@ -35,6 +38,7 @@ services:
   mongo-review:
     image: mongo:latest
     container_name: mongo-review
+    restart: unless-stopped
     volumes:
       - mongo-review-data:/data/db
     ports:
@@ -45,6 +49,7 @@ services:
   mongo-payment:
     image: mongo:latest
     container_name: mongo-payment
+    restart: unless-stopped
     volumes:
       - mongo-payment-data:/data/db
     ports:
@@ -56,34 +61,40 @@ services:
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
+      - NODE_ENV=production
       - PORT=3000
       - JWT_SECRET=DkG+eG6wYpGH0lmbEXqXMg+VlbNWoYlG9I8sUSe9jls=
+      - RATE_LIMIT_WINDOW_MS=900000
+      - RATE_LIMIT_MAX=100
+      - AUTH_RATE_LIMIT_MAX=10
       - USER_SERVICE_URL=http://user-service:3001
       - MENU_SERVICE_URL=http://menu-service:3002
       - ORDER_SERVICE_URL=http://order-service:3003
       - PAYMENT_SERVICE_URL=http://payment-service:3004
       - REVIEW_SERVICE_URL=http://review-service:3005
+      - LOG_LEVEL=info
     depends_on:
       - user-service
       - menu-service
       - order-service
-      - payment-service
-      - review-service
     networks:
       - restaurant-network
 
   user-service:
     build: ./user-service
     container_name: user-service
+    restart: unless-stopped
     ports:
       - "3001:3001"
     environment:
+      - NODE_ENV=production
       - PORT=3001
       - MONGO_URI=mongodb://mongo-user:27017/restaurant-users
-      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_SECRET=DkG+eG6wYpGH0lmbEXqXMg+VlbNWoYlG9I8sUSe9jls=
     depends_on:
       - mongo-user
     networks:
@@ -92,12 +103,14 @@ services:
   menu-service:
     build: ./menu-service
     container_name: menu-service
+    restart: unless-stopped
     ports:
       - "3002:3002"
     environment:
+      - NODE_ENV=production
       - PORT=3002
       - MONGO_URI=mongodb://mongo-menu:27017/restaurant-menu
-      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_SECRET=DkG+eG6wYpGH0lmbEXqXMg+VlbNWoYlG9I8sUSe9jls=
     depends_on:
       - mongo-menu
     networks:
@@ -106,12 +119,14 @@ services:
   order-service:
     build: ./order-service
     container_name: order-service
+    restart: unless-stopped
     ports:
       - "3003:3003"
     environment:
+      - NODE_ENV=production
       - PORT=3003
       - MONGO_URI=mongodb://mongo-order:27017/restaurant-orders
-      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_SECRET=DkG+eG6wYpGH0lmbEXqXMg+VlbNWoYlG9I8sUSe9jls=
       - MENU_SERVICE_URL=http://menu-service:3002
       - USER_SERVICE_URL=http://user-service:3001
     depends_on:
@@ -124,12 +139,14 @@ services:
   payment-service:
     build: ./payment-service
     container_name: payment-service
+    profiles: ["payments"]
     ports:
       - "3004:3004"
     environment:
+      - NODE_ENV=production
       - PORT=3004
       - MONGO_URI=mongodb://mongo-payment:27017/restaurant-payments
-      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_SECRET=DkG+eG6wYpGH0lmbEXqXMg+VlbNWoYlG9I8sUSe9jls=
       - ORDER_SERVICE_URL=http://order-service:3003
     depends_on:
       - mongo-payment
@@ -140,12 +157,14 @@ services:
   review-service:
     build: ./review-service
     container_name: review-service
+    profiles: ["reviews"]
     ports:
       - "3005:3005"
     environment:
+      - NODE_ENV=production
       - PORT=3005
       - MONGO_URI=mongodb://mongo-review:27017/restaurant-reviews
-      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_SECRET=DkG+eG6wYpGH0lmbEXqXMg+VlbNWoYlG9I8sUSe9jls=
       - USER_SERVICE_URL=http://user-service:3001
       - MENU_SERVICE_URL=http://menu-service:3002
     depends_on:
@@ -157,12 +176,14 @@ services:
 
   # Frontend
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:3000/api}
     container_name: frontend
+    restart: unless-stopped
     ports:
       - "80:80"
-    environment:
-      - REACT_APP_API_URL=http://localhost:3000/api
     depends_on:
       - api-gateway
     networks:
