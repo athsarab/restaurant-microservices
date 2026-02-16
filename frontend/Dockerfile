@@ -8,7 +8,7 @@ ENV REACT_APP_API_URL=${REACT_APP_API_URL}
 COPY package*.json ./
 RUN npm install
 
-COPY . .
+COPY . . 
 RUN npm run build
 
 # production stage
