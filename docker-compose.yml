@@ -10,7 +10,7 @@ services:
       - mongo-user-data:/data/db
     ports:
       - "27017:27017"
-    networks:
+    networks: 
       - restaurant-network
 
   mongo-menu:
