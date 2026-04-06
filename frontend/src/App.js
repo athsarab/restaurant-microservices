@@ -11,7 +11,7 @@ import Footer from './components/layout/Footer';
 import Home from './pages/Home';
 import Menu from './pages/Menu';
 import DishDetail from './pages/DishDetail';
-import Login from './pages/Login';
+import Login from './pages/Login'; 
 import Register from './pages/Register'; 
 import Profile from './pages/Profile';
 import Cart from './pages/Cart';
