@@ -1,241 +1,163 @@
-import React, { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
+import { getCartCount } from '../../utils/cart';
 
 const Header = () => {
   const { user, isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  
+  const [cartCount, setCartCount] = useState(0);
+
   const navigation = [
-    { name: 'Home', href: '/', current: true },
-    { name: 'Menu', href: '/menu', current: false },
-    { name: 'About', href: '/about', current: false },
-    { name: 'Contact', href: '/contact', current: false },
+    { name: 'Home', href: '/' },
+    { name: 'Menu', href: '/menu' },
+    { name: 'Orders', href: '/orders', protected: true }
   ];
+
+  useEffect(() => {
+    const syncCount = () => setCartCount(getCartCount());
+    syncCount();
+    window.addEventListener('cart-updated', syncCount);
+    window.addEventListener('storage', syncCount);
+
+    return () => {
+      window.removeEventListener('cart-updated', syncCount);
+      window.removeEventListener('storage', syncCount);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  function classNames(...classes) {
-    return classes.filter(Boolean).join(' ');
-  }
+  const linkClasses = ({ isActive }) => (
+    `${isActive ? 'text-primary-700' : 'text-slate-600 hover:text-primary-600'} text-sm font-semibold transition-colors`
+  );
 
   return (
-    <Disclosure as="nav" className="bg-white shadow">
+    <Disclosure as="header" className="sticky top-0 z-50 border-b border-white/60 bg-white/85 backdrop-blur-md">
       {({ open }) => (
         <>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 justify-between">
-              <div className="flex">
-                <div className="flex flex-shrink-0 items-center">
-                  <Link to="/">
-                    <img
-                      className="h-8 w-auto"
-                      src="/logo.png"
-                      alt="Restaurant Logo"
-                    />
-                  </Link>
+          <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-8">
+              <Link to="/" className="group flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-700 to-secondary-500 text-white shadow-lg shadow-secondary-200/60">
+                  T
                 </div>
-                <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={classNames(
-                        item.current
-                          ? 'border-primary-500 text-gray-900'
-                          : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                        'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium'
-                      )}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+                <div>
+                  <p className="font-display text-xl leading-5 text-slate-900">Taste of Heaven</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Craft Kitchen</p>
                 </div>
-              </div>
-              
-              <div className="flex items-center">
-                <div className="flex-shrink-0 mr-4">
-                  <Link to="/cart" className="relative">
-                    <ShoppingCartIcon className="h-6 w-6 text-gray-500 hover:text-gray-900" aria-hidden="true" />
-                    <span className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-primary-600 rounded-full">
-                      0
-                    </span>
-                  </Link>
-                </div>
-                
-                {isAuthenticated ? (
-                  <Menu as="div" className="relative ml-3">
-                    <div>
-                      <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                        <span className="sr-only">Open user menu</span>
-                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-semibold">
-                          {user?.name?.charAt(0)}
-                        </div>
-                      </Menu.Button>
-                    </div>
-                    <Transition
-                      enter="transition ease-out duration-200"
-                      enterFrom="transform opacity-0 scale-95"
-                      enterTo="transform opacity-100 scale-100"
-                      leave="transition ease-in duration-75"
-                      leaveFrom="transform opacity-100 scale-100"
-                      leaveTo="transform opacity-0 scale-95"
-                    >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <Menu.Item>
-                          {({ active }) => (
-                            <Link
-                              to="/profile"
-                              className={classNames(
-                                active ? 'bg-gray-100' : '',
-                                'block px-4 py-2 text-sm text-gray-700'
-                              )}
-                            >
-                              Profile
-                            </Link>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <Link
-                              to="/orders"
-                              className={classNames(
-                                active ? 'bg-gray-100' : '',
-                                'block px-4 py-2 text-sm text-gray-700'
-                              )}
-                            >
-                              Orders
-                            </Link>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <button
-                              onClick={handleLogout}
-                              className={classNames(
-                                active ? 'bg-gray-100' : '',
-                                'block w-full text-left px-4 py-2 text-sm text-gray-700'
-                              )}
-                            >
-                              Sign out
-                            </button>
-                          )}
-                        </Menu.Item>
-                      </Menu.Items>
-                    </Transition>
-                  </Menu>
-                ) : (
-                  <div className="hidden sm:flex sm:items-center sm:ml-6 space-x-4">
-                    <Link
-                      to="/login"
-                      className="inline-flex items-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
-                    >
-                      Sign in
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="inline-flex items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700"
-                    >
-                      Sign up
-                    </Link>
-                  </div>
+              </Link>
+
+              <nav className="hidden items-center gap-6 md:flex">
+                {navigation.filter((item) => !item.protected || isAuthenticated).map((item) => (
+                  <NavLink key={item.name} to={item.href} className={linkClasses}>
+                    {item.name}
+                  </NavLink>
+                ))}
+              </nav>
+            </div>
+
+            <div className="hidden items-center gap-3 md:flex">
+              <Link
+                to="/cart"
+                className="relative inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary-200 hover:text-primary-700"
+              >
+                <ShoppingBagIcon className="h-5 w-5" />
+                Cart
+                {cartCount > 0 && (
+                  <span className="absolute -right-2 -top-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-secondary-500 px-1 text-xs font-bold text-white">
+                    {cartCount}
+                  </span>
                 )}
-                
-                <div className="-mr-2 flex items-center sm:hidden">
-                  {/* Mobile menu button */}
-                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500">
-                    <span className="sr-only">Open main menu</span>
-                    {open ? (
-                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                    ) : (
-                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                    )}
-                  </Disclosure.Button>
-                </div>
-              </div>
+              </Link>
+
+              {isAuthenticated ? (
+                <Menu as="div" className="relative">
+                  <Menu.Button className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left hover:border-primary-200">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 font-bold uppercase text-primary-700">
+                      {user?.name?.charAt(0) || 'U'}
+                    </div>
+                    <span className="text-sm font-semibold text-slate-700">{user?.name || 'Account'}</span>
+                  </Menu.Button>
+                  <Transition
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xl">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link className={`${active ? 'bg-slate-50' : ''} block px-4 py-3 text-sm`} to="/profile">Profile</Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link className={`${active ? 'bg-slate-50' : ''} block px-4 py-3 text-sm`} to="/orders">My Orders</Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={handleLogout}
+                            className={`${active ? 'bg-slate-50' : ''} block w-full px-4 py-3 text-left text-sm text-red-600`}
+                          >
+                            Sign out
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
+              ) : (
+                <>
+                  <Link to="/login" className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Sign in</Link>
+                  <Link to="/register" className="rounded-xl bg-primary-700 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-800">Create account</Link>
+                </>
+              )}
+            </div>
+
+            <div className="md:hidden">
+              <Disclosure.Button className="rounded-lg p-2 text-slate-700 hover:bg-slate-100">
+                {open ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
+              </Disclosure.Button>
             </div>
           </div>
 
-          <Disclosure.Panel className="sm:hidden">
-            <div className="space-y-1 pt-2 pb-3">
-              {navigation.map((item) => (
+          <Disclosure.Panel className="border-t border-slate-100 bg-white px-4 pb-4 pt-2 md:hidden">
+            <div className="space-y-2">
+              {navigation.filter((item) => !item.protected || isAuthenticated).map((item) => (
                 <Disclosure.Button
                   key={item.name}
-                  as={Link}
+                  as={NavLink}
                   to={item.href}
-                  className={classNames(
-                    item.current
-                      ? 'bg-primary-50 border-primary-500 text-primary-700'
-                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700',
-                    'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
-                  )}
+                  className={({ isActive }) => `${isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-700'} block rounded-lg px-3 py-2 text-sm font-medium`}
                 >
                   {item.name}
                 </Disclosure.Button>
               ))}
+              <Disclosure.Button as={NavLink} to="/cart" className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700">
+                Cart ({cartCount})
+              </Disclosure.Button>
+              {isAuthenticated ? (
+                <>
+                  <Disclosure.Button as={NavLink} to="/profile" className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700">Profile</Disclosure.Button>
+                  <Disclosure.Button onClick={handleLogout} className="block rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600">Sign out</Disclosure.Button>
+                </>
+              ) : (
+                <>
+                  <Disclosure.Button as={NavLink} to="/login" className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700">Sign in</Disclosure.Button>
+                  <Disclosure.Button as={NavLink} to="/register" className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700">Create account</Disclosure.Button>
+                </>
+              )}
             </div>
-            {!isAuthenticated && (
-              <div className="border-t border-gray-200 pt-4 pb-3">
-                <div className="space-y-1">
-                  <Disclosure.Button
-                    as={Link}
-                    to="/login"
-                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                  >
-                    Sign in
-                  </Disclosure.Button>
-                  <Disclosure.Button
-                    as={Link}
-                    to="/register"
-                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                  >
-                    Sign up
-                  </Disclosure.Button>
-                </div>
-              </div>
-            )}
-            {isAuthenticated && (
-              <div className="border-t border-gray-200 pt-4 pb-3">
-                <div className="flex items-center px-4">
-                  <div className="flex-shrink-0">
-                    <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-semibold">
-                      {user?.name?.charAt(0)}
-                    </div>
-                  </div>
-                  <div className="ml-3">
-                    <div className="text-base font-medium text-gray-800">{user?.name}</div>
-                    <div className="text-sm font-medium text-gray-500">{user?.email}</div>
-                  </div>
-                </div>
-                <div className="mt-3 space-y-1">
-                  <Disclosure.Button
-                    as={Link}
-                    to="/profile"
-                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                  >
-                    Profile
-                  </Disclosure.Button>
-                  <Disclosure.Button
-                    as={Link}
-                    to="/orders"
-                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                  >
-                    Orders
-                  </Disclosure.Button>
-                  <Disclosure.Button
-                    onClick={handleLogout}
-                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                  >
-                    Sign out
-                  </Disclosure.Button>
-                </div>
-              </div>
-            )}
           </Disclosure.Panel>
         </>
       )}

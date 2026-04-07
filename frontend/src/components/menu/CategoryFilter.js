@@ -2,27 +2,27 @@ import React from 'react';
 
 const CategoryFilter = ({ categories, activeCategory, onCategoryChange }) => {
   return (
-    <div className="mb-8">
-      <h3 className="text-lg font-medium text-gray-900 mb-3">Categories</h3>
-      <div className="flex flex-wrap gap-2">
+    <div>
+      <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">Categories</h3>
+      <div className="mt-4 space-y-2">
         <button
           onClick={() => onCategoryChange(null)}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+          className={`w-full rounded-xl px-4 py-2.5 text-left text-sm font-semibold transition ${
             activeCategory === null
-              ? 'bg-primary-500 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-primary-100 text-primary-800'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >
-          All
+          All Dishes
         </button>
-        {categories.map(category => (
+        {categories.map((category) => (
           <button
             key={category._id}
             onClick={() => onCategoryChange(category._id)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`w-full rounded-xl px-4 py-2.5 text-left text-sm font-semibold transition ${
               activeCategory === category._id
-                ? 'bg-primary-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-primary-100 text-primary-800'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
             {category.name}

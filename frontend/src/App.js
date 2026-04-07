@@ -35,7 +35,7 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <main className="container">
+      <main className="app-main">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<Menu />} />

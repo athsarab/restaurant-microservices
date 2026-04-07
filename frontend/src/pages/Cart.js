@@ -1,28 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { getCartItems, removeCartItem, updateCartQuantity } from '../utils/cart';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [subTotal, setSubTotal] = useState(0);
   const { isAuthenticated } = useContext(AuthContext);
 
   useEffect(() => {
-    // Fetch cart items from localStorage
-    const fetchCartItems = () => {
-      const storedCart = localStorage.getItem('cart');
-      if (storedCart) {
-        const parsedCart = JSON.parse(storedCart);
-        setCartItems(parsedCart);
-
-        // Calculate subtotal
-        const total = parsedCart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-        setSubTotal(total);
-      }
+    const syncCart = () => {
+      const parsedCart = getCartItems();
+      setCartItems(parsedCart);
+      const total = parsedCart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+      setSubTotal(total);
     };
 
-    fetchCartItems();
+    syncCart();
+    window.addEventListener('cart-updated', syncCart);
+    return () => window.removeEventListener('cart-updated', syncCart);
   }, []);
 
   const updateQuantity = (id, newQuantity) => {
@@ -33,7 +29,7 @@ const Cart = () => {
     );
     
     setCartItems(updatedItems);
-    localStorage.setItem('cart', JSON.stringify(updatedItems));
+    updateCartQuantity(id, newQuantity);
 
     // Recalculate subtotal
     const total = updatedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
@@ -43,21 +39,12 @@ const Cart = () => {
   const removeFromCart = (id) => {
     const updatedItems = cartItems.filter(item => item._id !== id);
     setCartItems(updatedItems);
-    
-    if (updatedItems.length === 0) {
-      localStorage.removeItem('cart');
-    } else {
-      localStorage.setItem('cart', JSON.stringify(updatedItems));
-    }
+    removeCartItem(id);
 
     // Recalculate subtotal
     const total = updatedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     setSubTotal(total);
   };
-
-  if (loading) {
-    return <div className="text-center py-12">Loading...</div>;
-  }
 
   if (cartItems.length === 0) {
     return (
