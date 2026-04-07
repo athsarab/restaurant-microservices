@@ -23,7 +23,25 @@ const orderSchema = new mongoose.Schema({
     } 
   ],
   orderTotal: {
-    type: Number, 
+    type: Number,
+    required: true
+  },
+  subTotal: {
+    type: Number,
+    required: true
+  },
+  tax: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  deliveryFee: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  total: {
+    type: Number,
     required: true
   },
   shippingAddress: {
@@ -34,12 +52,12 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'preparing', 'delivering', 'completed', 'cancelled'],
+    enum: ['pending', 'processing', 'out_for_delivery', 'delivered', 'cancelled'],
     default: 'pending'
   },
   paymentMethod: {
     type: String,
-    enum: ['cash', 'credit', 'paypal'],
+    enum: ['cash', 'credit_card', 'paypal'],
     required: true
   },
   paymentStatus: {

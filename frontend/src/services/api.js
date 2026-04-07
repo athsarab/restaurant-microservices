@@ -91,6 +91,26 @@ export const orderService = {
   getOrderById: async (id) => {
     const response = await axios.get(`${API_URL}/orders/${id}`);
     return response.data;
+  },
+
+  cancelOrder: async (id) => {
+    const response = await axios.put(`${API_URL}/orders/${id}/cancel`);
+    return response.data;
+  }
+};
+
+export const paymentService = {
+  createPayment: async (paymentData) => {
+    const response = await axios.post(`${API_URL}/payments`, paymentData);
+    return response.data;
+  },
+  getUserPayments: async () => {
+    const response = await axios.get(`${API_URL}/payments`);
+    return response.data;
+  },
+  getPaymentByOrder: async (orderId) => {
+    const response = await axios.get(`${API_URL}/payments/order/${orderId}`);
+    return response.data;
   }
 };
 

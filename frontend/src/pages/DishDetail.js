@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { menuService, reviewService } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import { addItemToCart } from '../utils/cart';
 
 const DishDetail = () => {
   const { id } = useParams();
@@ -73,7 +74,7 @@ const DishDetail = () => {
   };
 
   const addToCart = () => {
-    // Add to cart implementation
+    addItemToCart(dish, quantity);
     toast.success(`Added ${quantity} ${dish.name} to cart`);
   };
 

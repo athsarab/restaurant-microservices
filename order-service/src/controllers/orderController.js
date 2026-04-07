@@ -8,7 +8,7 @@ exports.createOrder = async (req, res) => {
     const userId = req.user.id;
 
     // Calculate total price
-    let orderTotal = 0;
+    let subTotal = 0;
     for (const item of items) {
       // Verify dish details with menu-service
       try {
@@ -17,7 +17,7 @@ exports.createOrder = async (req, res) => {
         });
         
         const dish = dishResponse.data;
-        orderTotal += dish.price * item.quantity;
+        subTotal += dish.price * item.quantity;
         
         // Add dish name and price to order item
         item.name = dish.name;
@@ -28,12 +28,22 @@ exports.createOrder = async (req, res) => {
       }
     }
 
+    const tax = Number((subTotal * 0.08).toFixed(2));
+    const deliveryFee = Number((req.body.deliveryFee ?? 3.99).toFixed(2));
+    const total = Number((subTotal + tax + deliveryFee).toFixed(2));
+
+    const normalizedPaymentMethod = paymentMethod === 'credit' ? 'credit_card' : paymentMethod;
+
     const newOrder = new Order({
       user: userId,
       items,
-      orderTotal,
+      orderTotal: total,
+      subTotal,
+      tax,
+      deliveryFee,
+      total,
       shippingAddress,
-      paymentMethod,
+      paymentMethod: normalizedPaymentMethod,
       deliveryNotes,
       estimatedDeliveryTime: new Date(Date.now() + 45 * 60000) // 45 minutes from now
     });
@@ -92,6 +102,11 @@ exports.getOrderById = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
+    const allowedStatuses = ['pending', 'processing', 'out_for_delivery', 'delivered', 'cancelled'];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid order status' });
+    }
     
     // Only admin can update order status
     if (req.user.role !== 'admin') {
@@ -106,7 +121,7 @@ exports.updateOrderStatus = async (req, res) => {
     
     order.status = status;
     
-    if (status === 'completed') {
+    if (status === 'delivered') {
       order.deliveredAt = Date.now();
     }
     
@@ -138,8 +153,8 @@ exports.cancelOrder = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to cancel this order' });
     }
     
-    // Can only cancel orders that are pending or preparing
-    if (!['pending', 'preparing'].includes(order.status)) {
+    // Can only cancel orders that are pending or processing
+    if (!['pending', 'processing'].includes(order.status)) {
       return res.status(400).json({ message: `Order cannot be cancelled in ${order.status} status` });
     }
     
