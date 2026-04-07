@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { orderService } from '../services/api';
+import { clearCart } from '../utils/cart';
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
@@ -42,15 +43,15 @@ const Checkout = () => {
 
     // Pre-fill user information if available
     if (user) {
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         name: user.name || '',
         phone: user.phone || '',
         street: user.address?.street || '',
         city: user.address?.city || '',
         state: user.address?.state || '',
         zipCode: user.address?.zipCode || ''
-      });
+      }));
     }
 
     setLoading(false);
@@ -96,7 +97,7 @@ const Checkout = () => {
       const response = await orderService.createOrder(orderData);
 
       // Clear the cart
-      localStorage.removeItem('cart');
+      clearCart();
 
       // Redirect to order confirmation
       navigate(`/orders/${response._id}`, { 

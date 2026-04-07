@@ -34,10 +34,13 @@ const OrderHistory = () => {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'processing':
+      case 'preparing':
         return 'bg-blue-100 text-blue-800';
       case 'out_for_delivery':
+      case 'delivering':
         return 'bg-purple-100 text-purple-800';
       case 'delivered':
+      case 'completed':
         return 'bg-green-100 text-green-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
@@ -103,11 +106,11 @@ const OrderHistory = () => {
                     {formatDate(order.createdAt)}
                   </td>
                   <td className="py-4 px-6 text-right font-medium">
-                    ${order.total.toFixed(2)}
+                    ${(order.total ?? order.orderTotal ?? 0).toFixed(2)}
                   </td>
                   <td className="py-4 px-6 text-center">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeClass(order.status)}`}>
-                      {order.status.replace('_', ' ')}
+                      {(order.status || '').replace('_', ' ')}
                     </span>
                   </td>
                   <td className="py-4 px-6 text-center">
