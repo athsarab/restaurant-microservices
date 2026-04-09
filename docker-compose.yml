@@ -49,7 +49,7 @@ services:
       - menu-service
       - user-service
     networks:
-      - restaurant-network
+      - restaurant-network 
 
   payment-service:
     build: ./payment-service
