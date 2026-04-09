@@ -16,7 +16,7 @@ const logger = require('./utils/logger');
 
 // Import routes
 const userRoutes = require('./routes/userRoutes');
-const menuRoutes = require('./routes/menuRoutes');
+const menuRoutes = require('./routes/menuRoutes'); 
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
