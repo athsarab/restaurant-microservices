@@ -1,0 +1,10 @@
+{
+  "name": "Taste of Heaven",
+  "short_name": "Taste",
+  "description": "Modern restaurant ordering app",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fffef9",
+  "theme_color": "#c2410c"
+}
