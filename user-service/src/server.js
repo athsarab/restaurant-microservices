@@ -6,17 +6,10 @@ const dotenv = require('dotenv');
 
 // Load environment variables
 dotenv.config();
+mongoose.set('bufferCommands', false);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
- 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { 
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
 
 // Middleware
 app.use(cors());
@@ -31,6 +24,23 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.listen(PORT, () => {
-  console.log(`User service running on port ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000
+    });
+
+    console.log('MongoDB connected');
+    app.listen(PORT, () => {
+      console.log(`User service running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  }
+};
+
+startServer();
