@@ -52,7 +52,10 @@ const Register = () => {
       await register(userData);
       navigate('/');
     } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed. Please try again.');
+      const message = error.code === 'ECONNABORTED'
+        ? 'Registration timed out. Please check backend services and try again.'
+        : (error.response?.data?.message || 'Registration failed. Please try again.');
+      setError(message);
     } finally {
       setLoading(false);
     }
