@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+axios.defaults.timeout = 15000;
 
 // Set up axios interceptors for JWT
 axios.interceptors.request.use(
