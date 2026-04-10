@@ -10,6 +10,8 @@ const createServiceProxy = (target, options = {}) => {
   const defaultOptions = {
     target,
     changeOrigin: true,
+    proxyTimeout: 10000,
+    timeout: 10000,
     pathRewrite: options.pathRewrite || undefined,
     onProxyReq: (proxyReq, req, res) => {
       // Forward auth headers if they exist
