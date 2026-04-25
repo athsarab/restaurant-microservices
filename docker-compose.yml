@@ -13,7 +13,7 @@ services:
       - menu-service
       - order-service
     networks:
-      - restaurant-network
+      - restaurant-network 
 
   user-service:
     build: ./user-service
