@@ -11,7 +11,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async () => { 
       try {
         const [dishesResponse, categoriesResponse] = await Promise.all([
           menuService.getAllDishes(),
