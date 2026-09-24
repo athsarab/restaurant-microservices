@@ -15,7 +15,7 @@ This project is split into independent services so each domain can evolve and de
 - `menu-service`: categories and dishes
 - `order-service`: order placement and tracking
 - `payment-service`: payment records and status
-- `review-service`: dish reviews
+- `review-service`: dish reviews 
 - `frontend`: customer-facing UI
 
 ## Architecture
